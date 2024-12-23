@@ -1,4 +1,4 @@
-# 迷子行動解析プログラム
+# 卒論の実験の分析プログラム(分散分析)
 
 ## 環境構築
 
@@ -25,6 +25,7 @@ pip install pandas numpy scipy matplotlib seaborn statsmodels japanize-matplotli
 
 python -c "import torch; print(torch.__version__)"
 
+
 ## プロジェクト構成
 analyze/
 ├── data/
@@ -35,4 +36,4 @@ analyze/
 └── analyze.py
 
 ## 実行方法
-`python index.py`# analysis-for-my-undergraduate-thesis
+`python index.py`

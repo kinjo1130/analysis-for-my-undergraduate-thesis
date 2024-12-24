@@ -3,6 +3,34 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 import japanize_matplotlib
+from statsmodels.stats.anova import AnovaRM
+
+def analyze_three_way_interaction(df_3way):
+    """
+    3要因(A,B,C)の繰り返し測定ANOVAを行い、交互作用を含む結果を表示する。
+    
+    事前に df_3way の中に以下の列があることを想定:
+        - 'subject': 被験者ID (同一被験者は同じ値)
+        - 'A': 要因A (例: '多い'/'少ない')
+        - 'B': 要因B (例: '速い'/'遅い')
+        - 'C': 要因C (例: '止まる'/'止まらない')
+        - 'score': 迷子感 or 他の測定値
+
+    Returns
+    -------
+    anova_result : AnovaRM fit 結果オブジェクト
+    """
+    model = AnovaRM(data=df_3way,
+                    depvar='score',
+                    subject='subject',
+                    within=['A','B','C'])  # 3要因
+    anova_result = model.fit()
+    
+    print("\n--- 3要因繰り返し測定ANOVA 結果 ---")
+    print(anova_result)
+    print("------------------------------------\n")
+    return anova_result
+
 
 
 def label_significance(p_value):
@@ -250,6 +278,21 @@ def main():
         # 棒グラフの描画・保存（相関係数）
         plot_correlation(results)
         print("\n分析が完了しました。グラフは 'correlation_plot.png' として保存されました。")
+
+        # (2) ここで 3要因のデータを整備して解析する
+        #     例: もし "combined_df" を返すように analyze_multiple_experiments() を
+        #         書き換えていたなら、そこからA,B,C,subject,score列を作る。
+        #         あるいは別途CSVを読み込み直す。
+
+        # 仮に、"df_3way.csv" というファイルに下記の列があるとする:
+        #   subject, A, B, C, score
+        #   (1人の被験者が8条件(= A×B×C)を体験したデータ)
+        df_3way = pd.read_csv("df_3way.csv")
+        
+        # 交互作用解析
+        anova_result = analyze_three_way_interaction(df_3way)
+        # anova_result は AnovaRM.fit() の返り値で、印刷されたテーブルに交互作用(A:B, A:C, B:C, A:B:C)が出力されます。
+
     except Exception as e:
         print(f"エラーが発生しました: {e}")
 
